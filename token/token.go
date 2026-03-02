@@ -11,12 +11,15 @@ const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
+	// Identifiers + literals
 	IDENT = "IDENT"
 	INT   = "INT"
 
+	// Operators
 	ASSIGN = "="
 	PLUS   = "+"
 
+	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
 
@@ -25,6 +28,20 @@ const (
 	LBRACE = "{"
 	RBRACE = "}"
 
+	// Keywords
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
 )
+
+var keywords = map[string]TokenType{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
+// LookupIdent checks if the input is valid keyword and returns maped keyword constant, if not returns identifier token type
+func LookupIdent(ident string) TokenType {
+	if tok, ok := keywords[ident]; ok {
+		return tok
+	}
+	return IDENT
+}
