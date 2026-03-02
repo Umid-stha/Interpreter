@@ -56,6 +56,7 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[position:l.position]
 }
 
+// readInt is same as readIdentifier for numbers
 func (l *Lexer) readInt() string {
 	position := l.position
 	for isDigit(l.ch) {
@@ -71,19 +72,33 @@ func (l *Lexer) skipWhiteSpace() {
 	}
 }
 
+// return the char at readPostion
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
+}
+
 /*
 nextToken checks the current character and returns the appropriate token based on it.
 It uses a switch statement to determine the type of token to return.
 After determining the token, it calls readChar to advance to the next character in the input.
 */
-func (l *Lexer) nextToken() token.Token {
+func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
 	l.skipWhiteSpace()
 
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = newToken(token.EQ, string(ch)+string(l.ch))
+		} else {
+			tok = newToken(token.ASSIGN, l.ch)
+		}
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
 	case '(':
@@ -94,6 +109,24 @@ func (l *Lexer) nextToken() token.Token {
 		tok = newToken(token.COMMA, l.ch)
 	case '+':
 		tok = newToken(token.PLUS, l.ch)
+	case '-':
+		tok = newToken(token.MINUS, l.ch)
+	case '!':
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = newToken(token.NOT_EQ, string(ch)+string(l.ch))
+		} else {
+			tok = newToken(token.BANG, l.ch)
+		}
+	case '/':
+		tok = newToken(token.SLASH, l.ch)
+	case '*':
+		tok = newToken(token.ASTERISK, l.ch)
+	case '<':
+		tok = newToken(token.LT, l.ch)
+	case '>':
+		tok = newToken(token.GT, l.ch)
 	case '{':
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
@@ -119,7 +152,7 @@ func (l *Lexer) nextToken() token.Token {
 }
 
 // newToken is a helper function that creates a new token based on the given token type and character.
-func newToken(tokenType token.TokenType, ch byte) token.Token {
+func newToken[C string | byte](tokenType token.TokenType, ch C) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
@@ -128,6 +161,7 @@ func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
+// checks if the character is valid number
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
