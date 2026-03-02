@@ -6,6 +6,12 @@ import (
 	"github.com/umid-stha/interpreter/token"
 )
 
+/*
+TestNextToken tests the nextToken method of the Lexer struct.
+It initializes a Lexer with a sample input string and defines a series of expected tokens.
+The test iterates through the expected tokens, calling nextToken on the Lexer and comparing the returned token's type and literal value to the expected values.
+If there is a mismatch, the test fails with an appropriate error message.
+*/
 func TestNextToken(t *testing.T) {
 	input := `=+(){},;`
 
@@ -14,7 +20,7 @@ func TestNextToken(t *testing.T) {
 		expectedLiteral string
 	}{
 		{token.ASSIGN, "="},
-		{token.PLUS, "+"},
+		{token.PLUS, ")"},
 		{token.LPAREN, "("},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
